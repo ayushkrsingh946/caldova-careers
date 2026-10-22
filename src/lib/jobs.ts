@@ -7,11 +7,26 @@
  */
 import type { Job } from '../types/job';
 
+/** Return jobs in the selected department, or all jobs when no department is selected. */
+export function filterJobsByDepartment(jobs: Job[], department: string): Job[] {
+  return jobs.filter((job) => !department || job.department === department);
+}
+
+/** Return jobs in the selected location, or all jobs when no location is selected. */
+export function filterJobsByLocation(jobs: Job[], location: string): Job[] {
+  return jobs.filter((job) => !location || job.location === location);
+}
+
+/** Apply the selected department and location filters together using AND semantics. */
+export function filterJobs(jobs: Job[], department: string, location: string): Job[] {
+  return filterJobsByLocation(filterJobsByDepartment(jobs, department), location);
+}
+
 /** Return jobs sorted by posted date, newest first (does not mutate input). */
 export function sortByNewest(jobs: Job[]): Job[] {
-    return [...jobs].sort(
-        (a, b) => new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime(),
-    );
+  return [...jobs].sort(
+    (a, b) => new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime(),
+  );
 }
 
 /**
@@ -19,14 +34,14 @@ export function sortByNewest(jobs: Job[]): Job[] {
  * e.g. "January 5, 2027". Falls back to the raw value if unparseable.
  */
 export function formatPostedDate(iso: string): string {
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) {
-        return iso;
-    }
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: 'UTC',
-    });
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
 }
